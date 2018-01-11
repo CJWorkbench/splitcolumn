@@ -2,6 +2,9 @@ def render(table, params):
   delim = params['delimiter']
   col = params['column']
   
+  if col=='' or delim=='':
+    return None
+  
   # the actual split
   newcols =  table[col].str.split(delim, expand=True)
   newcols.columns = [col + ' ' + str(x+1) for x in newcols.columns]
