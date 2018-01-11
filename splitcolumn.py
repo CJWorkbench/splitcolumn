@@ -3,7 +3,7 @@ def render(table, params):
   col = params['column']
   
   if col=='' or delim=='':
-    return None
+    return table
   
   # the actual split
   newcols =  table[col].str.split(delim, expand=True)
