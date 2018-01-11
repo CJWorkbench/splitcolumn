@@ -7,6 +7,8 @@ def render(table, params):
   
   # the actual split
   newcols =  table[col].str.split(delim, expand=True)
+  if len(newcols.columns) == 1:
+    return table # we didn't find the delimiter anywhere
   newcols.columns = [col + ' ' + str(x+1) for x in newcols.columns]
   
   # now glue before, split, and after columns together 
