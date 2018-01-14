@@ -1,5 +1,5 @@
 {
-  "name": "Split Column",
+  "name": "Split column",
   "id_name": "splitcolumn",
   "description": "Split column on delimiter character or string into multiple columns ",
   "category" : "Analyse",
