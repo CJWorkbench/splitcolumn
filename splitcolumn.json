@@ -2,8 +2,8 @@
   "name": "Split Column",
   "id_name": "splitcolumn",
   "description": "Split column on delimiter character or string into multiple columns ",
-  "category" : "Transform",
-  "icon": "transform-v",
+  "category" : "Analyse",
+  "icon": "transform",
   "parameters": [
     {
       "name": "Column",
