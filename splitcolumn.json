@@ -11,10 +11,10 @@
       "type": "column"
     },
     {
-      "name": "Delimiter (character or string)",
+      "name": "Delimiter",
       "id_name" : "delimiter",
       "type" : "string",
-      "default": ","
+      "default": "e.g. ',' or '/' or any letter or number"
     }
   ]
 }
