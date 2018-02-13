@@ -16,7 +16,7 @@
       "id_name" : "delimiter",
       "type" : "string",
       "placeholder": "Any string, number or charachter",
-      "default":"-",
+      "default":"-"
     }
   ]
 }
