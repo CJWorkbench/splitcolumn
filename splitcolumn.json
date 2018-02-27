@@ -4,7 +4,7 @@
   "description": "Split column on delimiter character or string into multiple columns ",
   "category" : "Prepare",
   "icon": "transform",
-  "help_url":"modules/analyse/split-column",
+  "help_url":"modules/prepare/split-column",
   "parameters": [
     {
       "name": "Column",
