@@ -2,9 +2,9 @@
   "name": "Split column",
   "id_name": "splitcolumn",
   "description": "Split column on delimiter character or string into multiple columns ",
-  "category" : "Prepare",
+  "category" : "Clean",
   "icon": "transform",
-  "help_url":"modules/prepare/split-column",
+  "help_url":"modules/clean/split-column",
   "parameters": [
     {
       "name": "Column",
