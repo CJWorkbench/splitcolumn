@@ -3,7 +3,7 @@
   "id_name": "splitcolumn",
   "description": "Split column on delimiter character or string into multiple columns ",
   "category" : "Clean",
-  "icon": "reshape",
+  "icon": "split",
   "help_url":"modules/clean/split-column",
   "parameters": [
     {
