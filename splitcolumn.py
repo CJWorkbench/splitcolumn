@@ -1,46 +1,86 @@
-def render(table, params):
-    delim = params['delimiter']
-    col = params['column']
+import pandas as pd
+import numpy as np
 
-    if col == '' or delim == '':
-      return table
 
-    # the actual split, output to str and cat dtypes for now
-    if table[col].dtype.name == 'category':
-        if table[col].cat.categories.dtype == float:
-            newcols = (convert_float(table[col].astype(float), delim)).astype('category')
-        elif table[col].cat.categories.dtype == object:
-            # Must add '' to category if want to remove NaN
-            copy = table[col].copy()
+# Take a string column, split according to user's chosen method
+# Returns a table (multiple columns) of string category type
+def dosplit(coldata, params):
+    if 'method' not in params or params['method'] == 'Delimiter':
+        # v1 params, always split on delimiter
+        delim = params['delimiter']
+        return coldata.str.split(delim, expand=True)
+
+    numchars = params['numchars']
+
+    if params['method'] == 'Characters from left':
+        return col 
+    else:   # 'Characters from right
+        return col
+
+# Convert float column to string, remove decimal if float is a whole number
+# and fill nulls with '' to avoid 'NaN'
+# (To be replaced when we have type format utilities)
+def convert_float_to_str(col):
+    ints = col[col % 1 == 0].astype(int)
+    col = col.fillna('').astype(str)
+    col.update(ints.astype(str))
+    return col
+
+
+# Converts all possible column types to simple strings, including categorical
+def col_to_str(col):
+    
+    if col.dtype.name == 'category':
+        if col.cat.categories.dtype == float:
+            # Floats stored as categories
+            return convert_float_to_str(col.astype(float))
+
+        elif col.cat.categories.dtype == object: 
+            # Strings stored as categories
+            copy = col.copy()
             if '' not in copy.cat.categories:
-                copy.cat.add_categories([''], inplace=True)
-            newcols = copy.fillna('').str.split(delim, expand=True).astype('category')
+                copy.cat.add_categories([''], inplace=True) # Must add '' to category if want to remove NaN
+            return copy.fillna('')
+
         else:
-            newcols = table[col].astype(str).str.split(delim, expand=True).astype('category')
-    # fill nulls with '' to avoid 'NaN'
-    elif table[col].dtype == float:
-        newcols = convert_float(table[col], delim)
+            # Some other categorical type. Cast to string.
+            return col.astype(str)
+
+    elif col.dtype == float:
+        # Floats
+        return convert_float_to_str(col)
 
     else:
-        newcols = table[col].astype(str).str.split(delim, expand=True)
+        # Everything else (e.g. normal, non categorical strings)
+        return col.astype(str)
 
-    # we didn't find the delimiter anywhere
+
+def render(table, params):
+    colname = params['column']
+
+    if colname == '' or params['delimiter'] == '':
+      return table
+
+    coldata = col_to_str(table[colname])
+    newcols = dosplit(coldata, params)
+
+    # NOP if we didn't find the delimiter anywhere
     if len(newcols.columns) == 1:
       return table
 
-    newcols.columns = [col + ' ' + str(x+1) for x in newcols.columns]
+    # preserve category-ness (cat string, cat float, etc.)
+    if table[colname].dtype.name == 'category':
+        newcols = newcols.astype('category')
 
-    # now glue before, split, and after columns together
-    colloc = table.columns.get_loc(col)
+    # Number the split columns
+    newcols.columns = [colname + ' ' + str(x+1) for x in newcols.columns]
+
+    # glue before, split, and after columns together
+    colloc = table.columns.get_loc(colname)
     start = table.iloc[:, :colloc]
     end = table.iloc[:, colloc+1:]
     return pd.concat([start, newcols, end], axis=1)
 
-# Special case: remove decimal if float is a whole number
-def convert_float(col, delim):
-    # Special case: remove decimal if float is a whole number
-    ints = col[col % 1 == 0].astype(int)
-    col = col.fillna('').astype(str)
-    col.update(ints.astype(str))
-    return col.str.split(delim, expand=True)
+
+
 

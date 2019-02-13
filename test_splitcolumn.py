@@ -136,6 +136,7 @@ class TestSplitColumns(unittest.TestCase):
                                       [['2', '2', '2', '2', ''],
                                        ['1', None, '1', '1', None]])
 
+        # Require float categorical type to be preserved. 
         ref['floatcatcol 1'] = ref['floatcatcol 1'].astype('category')
         ref['floatcatcol 2'] = ref['floatcatcol 2'].astype('category')
 
