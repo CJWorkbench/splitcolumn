@@ -1,7 +1,7 @@
 {
   "name": "Split column",
   "id_name": "splitcolumn",
-  "description": "Split column on delimiter character or string into multiple columns ",
+  "description": "Split a column on a delimiter or by taking characters from left or right end",
   "category" : "Clean",
   "icon": "split",
   "help_url":"modules/clean/split-column",
@@ -12,11 +12,32 @@
       "type": "column"
     },
     {
+      "name": "Method",
+      "id_name": "method",
+      "type": "menu",
+      "menu_items" : "Delimiter|Characters from left|Characters from right",
+      "default" : 0
+    },
+    {
       "name": "Delimiter",
       "id_name" : "delimiter",
-      "type" : "string",
-      "placeholder": "Any string, number or charachter",
-      "default":"-"
+      "type": "string",
+      "placeholder": "Any string, number or character",
+      "default":"-",
+      "visible_if": {
+        "id_name": "method",
+        "value": "Delimiter"
+      }
+    },
+    {
+      "id_name": "numchars",
+      "name": "Number of Characters",
+      "type": "integer",
+      "default": 1,
+      "visible_if": {
+          "id_name" : "method",
+          "value": "Characters from left|Characters from right"
+      }
     }
   ]
 }

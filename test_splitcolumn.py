@@ -36,13 +36,15 @@ class TestSplitColumns(unittest.TestCase):
         return ref
 
     def test_NOP(self):
-        params = {'delimiter': '', 'column': 'stringcol'}
-        out = render(self.table, params)
-        self.assertTrue(out.equals(self.table)) # should NOP when first applied
-
+        # should NOP when first applied (no col chosen or empty delim)
         params = {'delimiter': '-', 'column': ''}
         out = render(self.table, params)
         self.assertTrue(out.equals(self.table))
+
+        params = {'column': 'stringcol', 'delimiter': ''}
+        out = render(self.table, params)
+        self.assertTrue(out.equals(self.table)) 
+
 
     def test_split_str(self):
         column = 'stringcol'
@@ -163,6 +165,61 @@ class TestSplitColumns(unittest.TestCase):
         out = render(self.table, params)
         ref = self.table
         self.assertTrue(out.equals(ref))
+
+
+    def test_split_left(self):
+        column = 'stringcol'
+        params = {'column': column, 'method': 1, 'numchars':2 }
+        out = render(self.table, params)
+
+        # Assert old column removed
+        self.assertTrue((set(self.table.columns)-set(out.columns) == set([column])))
+
+        ref = self.construct_expected(self.table, column,
+                   [['a.']*5,
+                    ['b']*5])
+
+        pd.testing.assert_frame_equal(out, ref)
+
+
+    def test_split_right(self):
+        column = 'stringcol'
+        params = {'column': column, 'method': 2, 'numchars':2 }
+        out = render(self.table, params)
+
+        # Assert old column removed
+        self.assertTrue((set(self.table.columns)-set(out.columns) == set([column])))
+
+        ref = self.construct_expected(self.table, column,
+                   [['a']*5,
+                    ['.b']*5])
+
+        pd.testing.assert_frame_equal(out, ref)
+
+
+    def test_split_right_bad_param(self):
+        # Negative split, do nothing
+        column = 'stringcol'
+        params = {'column': column, 'method': 2, 'numchars':-2 }
+        out = render(self.table, params)
+        self.assertTrue(out.equals(self.table))
+
+
+    def test_split_right_many_characters(self):
+        # if we ask for more characters than there are, we should get all of them plus an empty column
+        column = 'stringcol'
+        params = {'column': column, 'method': 2, 'numchars':20 }
+        out = render(self.table, params)
+
+        # Assert old column removed
+        self.assertTrue((set(self.table.columns)-set(out.columns) == set([column])))
+
+        ref = self.construct_expected(self.table, column,
+                   [['']*5,
+                    ['a.b']*5])
+
+        pd.testing.assert_frame_equal(out, ref)
+
 
 if __name__ == '__main__':
     unittest.main()
