@@ -95,12 +95,14 @@ def render(table, params):
     # Number the split columns
     newcols.columns = [colname + ' ' + str(x+1) for x in range(len(newcols.columns))]
 
-    # glue before, split, and after columns together
-    colloc = table.columns.get_loc(colname)
-    start = table.iloc[:, :colloc]
-    end = table.iloc[:, colloc+1:]
-    return pd.concat([start, newcols, end], axis=1)
-
+    if len(table.columns)>1:
+        # glue before, split, and after columns together
+        colloc = table.columns.get_loc(colname)
+        start = table.iloc[:, :colloc]
+        end = table.iloc[:, colloc+1:]
+        return pd.concat([start, newcols, end], axis=1)
+    else:
+        return newcols
 
 
 

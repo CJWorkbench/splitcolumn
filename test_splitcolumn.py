@@ -75,6 +75,14 @@ class TestSplitColumns(unittest.TestCase):
 
         pd.testing.assert_frame_equal(out, ref)
 
+    def test_split_one_col(self):
+        # We had a crash here, so now we have a test
+        table = pd.DataFrame({'A':['foo666']})
+        params = {'column': 'A', 'method': 2, 'numchars':3 }
+        out = render(table, params)
+        ref = pd.DataFrame({'A 1':['foo'], 'A 2':['666']})
+        pd.testing.assert_frame_equal(out, ref)
+
     def test_split_float(self):
         column = 'floatcol'
         params = {'delimiter': '.', 'column': column}
