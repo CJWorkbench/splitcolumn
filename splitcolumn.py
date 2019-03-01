@@ -2,11 +2,22 @@ import pandas as pd
 import numpy as np
 
 
+
+def migrate_params(params):
+    # go from 'method' as integer to 'method' as string 
+
+    if isinstance(params['method'], int):
+        params = dict(params)  # copy
+        params['method'] = ['delimiter','left','right'][params['method']]
+
+    return params
+
+
 # Take a string column, split according to user's chosen method
 # Returns a table (multiple columns) of string category type, or None meaning NOP
 def dosplit(coldata, params):
     # v1 params or method = Delimiter
-    if 'method' not in params or params['method'] == 0:     # 'Delimiter'
+    if 'method' not in params or params['method'] == 'delimiter':
         delim = params['delimiter']
         return coldata.str.split(delim, expand=True)
 
@@ -15,7 +26,7 @@ def dosplit(coldata, params):
     if numchars<=0:
         return None    # NOP
 
-    if params['method'] == 1:   # 'Characters from left'
+    if params['method'] == 'left':
         return pd.concat([coldata.str[:numchars], coldata.str[numchars:]], axis=1)
     else:   
         # 'Characters from right
@@ -65,7 +76,7 @@ def render(table, params):
     if colname == '':
       return table
 
-    using_delimiter = ('method' not in params) or (params['method']==0)
+    using_delimiter = ('method' not in params) or (params['method']=='delimiter')
     if using_delimiter and params['delimiter']=='':
         return table   # Empty delimiter, NOP
 

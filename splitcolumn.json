@@ -15,8 +15,12 @@
       "name": "Method",
       "id_name": "method",
       "type": "menu",
-      "menu_items" : "Delimiter|Characters from left|Characters from right",
-      "default" : 0
+      "options": [
+        { "value": "delimiter", "label": "Delimiter" },
+        { "value": "left", "label": "Characters from left" },
+        { "value": "right", "label": "Characters from right" }
+      ],
+      "default": "delimiter"
     },
     {
       "name": "Delimiter",
@@ -26,7 +30,7 @@
       "default":"-",
       "visible_if": {
         "id_name": "method",
-        "value": "Delimiter"
+        "value": ["delimiter"]
       }
     },
     {
@@ -36,7 +40,7 @@
       "default": 1,
       "visible_if": {
           "id_name" : "method",
-          "value": "Characters from left|Characters from right"
+          "value": ["left","right"]
       }
     }
   ]

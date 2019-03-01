@@ -1,7 +1,7 @@
 import unittest
 import pandas as pd
 import numpy as np
-from splitcolumn import render
+from splitcolumn import render,migrate_params
 
 
 class TestSplitColumns(unittest.TestCase):
@@ -37,18 +37,18 @@ class TestSplitColumns(unittest.TestCase):
 
     def test_NOP(self):
         # should NOP when first applied (no col chosen or empty delim)
-        params = {'delimiter': '-', 'column': ''}
+        params = {'column': '', 'method':'delimiter', 'delimiter': '-'}
         out = render(self.table, params)
         self.assertTrue(out.equals(self.table))
 
-        params = {'column': 'stringcol', 'delimiter': ''}
+        params = {'column': 'stringcol', 'method':'delimiter', 'delimiter': ''}
         out = render(self.table, params)
         self.assertTrue(out.equals(self.table)) 
 
 
     def test_split_str(self):
         column = 'stringcol'
-        params = {'delimiter': '.', 'column': column}
+        params = {'column': column, 'method':'delimiter', 'delimiter': '.'}
         out = render(self.table, params)
 
         # Assert old column removed
@@ -62,7 +62,7 @@ class TestSplitColumns(unittest.TestCase):
 
     def test_split_int(self):
         column = 'intcol'
-        params = {'delimiter': '2', 'column': column}
+        params = {'delimiter': '2', 'column': column, 'method':'delimiter'}
         out = render(self.table, params)
         ref = self.table
 
@@ -78,14 +78,14 @@ class TestSplitColumns(unittest.TestCase):
     def test_split_one_col(self):
         # We had a crash here, so now we have a test
         table = pd.DataFrame({'A':['foo666']})
-        params = {'column': 'A', 'method': 2, 'numchars':3 }
+        params = {'column': 'A', 'method': 'right', 'numchars':3 }
         out = render(table, params)
         ref = pd.DataFrame({'A 1':['foo'], 'A 2':['666']})
         pd.testing.assert_frame_equal(out, ref)
 
     def test_split_float(self):
         column = 'floatcol'
-        params = {'delimiter': '.', 'column': column}
+        params = {'delimiter': '.', 'column': column, 'method':'delimiter'}
         out = render(self.table, params)
         ref = self.table
 
@@ -100,7 +100,7 @@ class TestSplitColumns(unittest.TestCase):
 
     def test_split_cat(self):
         column = 'catcol'
-        params = {'delimiter': '.', 'column': column}
+        params = {'delimiter': '.', 'column': column, 'method':'delimiter'}
         out = render(self.table, params)
         ref = self.table
 
@@ -118,7 +118,7 @@ class TestSplitColumns(unittest.TestCase):
         pd.testing.assert_frame_equal(out, ref)
 
         column = 'intcatcol'
-        params = {'delimiter': '2', 'column': column}
+        params = {'delimiter': '2', 'column': column, 'method':'delimiter'}
         out = render(self.table, params)
         ref = self.table
 
@@ -135,7 +135,7 @@ class TestSplitColumns(unittest.TestCase):
 
     def test_split_cat_float(self):
         column = 'floatcatcol'
-        params = {'delimiter': '.', 'column': column}
+        params = {'delimiter': '.', 'column': column, 'method':'delimiter'}
         out = render(self.table, params)
         ref = self.table
 
@@ -154,7 +154,7 @@ class TestSplitColumns(unittest.TestCase):
 
     def test_multiple_splits(self):
         column = 'datecol'
-        params = {'delimiter': '-', 'column': column}
+        params = {'delimiter': '-', 'column': column, 'method':'delimiter'}
         out = render(self.table, params)
         ref = self.table
 
@@ -169,7 +169,7 @@ class TestSplitColumns(unittest.TestCase):
         pd.testing.assert_frame_equal(out, ref)
 
     def test_no_del_found(self):
-        params = {'delimiter': '!', 'column': 'stringcol'}
+        params = {'delimiter': '!', 'column': 'stringcol', 'method':'delimiter'}
         out = render(self.table, params)
         ref = self.table
         self.assertTrue(out.equals(ref))
@@ -177,7 +177,7 @@ class TestSplitColumns(unittest.TestCase):
 
     def test_split_left(self):
         column = 'stringcol'
-        params = {'column': column, 'method': 1, 'numchars':2 }
+        params = {'column': column, 'method': 'left', 'numchars':2 }
         out = render(self.table, params)
 
         # Assert old column removed
@@ -192,7 +192,7 @@ class TestSplitColumns(unittest.TestCase):
 
     def test_split_right(self):
         column = 'stringcol'
-        params = {'column': column, 'method': 2, 'numchars':2 }
+        params = {'column': column, 'method': 'right', 'numchars':2 }
         out = render(self.table, params)
 
         # Assert old column removed
@@ -208,7 +208,7 @@ class TestSplitColumns(unittest.TestCase):
     def test_split_right_bad_param(self):
         # Negative split, do nothing
         column = 'stringcol'
-        params = {'column': column, 'method': 2, 'numchars':-2 }
+        params = {'column': column, 'method': 'right', 'numchars':-2 }
         out = render(self.table, params)
         self.assertTrue(out.equals(self.table))
 
@@ -216,7 +216,7 @@ class TestSplitColumns(unittest.TestCase):
     def test_split_right_many_characters(self):
         # if we ask for more characters than there are, we should get all of them plus an empty column
         column = 'stringcol'
-        params = {'column': column, 'method': 2, 'numchars':20 }
+        params = {'column': column, 'method': 'right', 'numchars':20 }
         out = render(self.table, params)
 
         # Assert old column removed
@@ -228,6 +228,16 @@ class TestSplitColumns(unittest.TestCase):
 
         pd.testing.assert_frame_equal(out, ref)
 
+    def test_parameter_migration(self):
+        # convert ints to equivalent string
+        params = {'column':'foo', 'method':1, 'delimiter':','}
+        new_params = migrate_params(params)
+        self.assertDictEqual(new_params, {'column':'foo', 'method':'left', 'delimiter':','})
+
+        # don't convert if method is already string
+        params = {'column':'foo', 'method':'right', 'delimiter':','}
+        new_params = migrate_params(params)
+        self.assertDictEqual(params, new_params)
 
 if __name__ == '__main__':
     unittest.main()
