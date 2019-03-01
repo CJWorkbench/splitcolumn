@@ -3,12 +3,28 @@ import numpy as np
 
 
 
+def _migrate_params_v0_to_v1(params):
+    """
+    v0: no 'method'
+
+    v1: 'method' is an index into "Delimiter|Chars from Left|Chars from Right"
+    """
+    return {**params, 'method': 0}
+
+def _migrate_params_v1_to_v2(params):
+    """
+    v1: 'method' is an index into "Delimiter|Chars from Left|Chars from Right"
+
+    v2: 'method' is one of 'delimiter', 'left', 'right'
+    """
+    return {**params, 'method': ['delimiter','left','right'][params['method']]}
+
 def migrate_params(params):
-    # go from 'method' as integer to 'method' as string 
+    if 'method' not in params:
+        params = _migrate_params_v0_to_v1(params)
 
     if isinstance(params['method'], int):
-        params = dict(params)  # copy
-        params['method'] = ['delimiter','left','right'][params['method']]
+        params = _migrate_params_v1_to_v2(params)
 
     return params
 

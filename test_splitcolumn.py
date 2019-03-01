@@ -228,7 +228,15 @@ class TestSplitColumns(unittest.TestCase):
 
         pd.testing.assert_frame_equal(out, ref)
 
-    def test_parameter_migration(self):
+
+    def test_parameter_migration_v0_to_v1(self):
+        # convert ints to equivalent string
+        params = {'column':'foo', 'delimiter':','}
+        new_params = migrate_params(params)
+        self.assertDictEqual(new_params, {'column':'foo', 'method':'delimiter', 'delimiter':','})
+
+
+    def test_parameter_migration_v1_to_v2(self):
         # convert ints to equivalent string
         params = {'column':'foo', 'method':1, 'delimiter':','}
         new_params = migrate_params(params)
