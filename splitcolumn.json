@@ -12,13 +12,13 @@
       "type": "column"
     },
     {
-      "name": "Method",
+      "name": "Split on",
       "id_name": "method",
       "type": "menu",
       "options": [
         { "value": "delimiter", "label": "Delimiter" },
-        { "value": "left", "label": "Characters from left" },
-        { "value": "right", "label": "Characters from right" }
+        { "value": "left", "label": "X characters from left" },
+        { "value": "right", "label": "X characters from right" }
       ],
       "default": "delimiter"
     },
