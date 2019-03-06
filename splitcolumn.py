@@ -9,7 +9,7 @@ def _migrate_params_v0_to_v1(params):
 
     v1: 'method' is an index into "Delimiter|Chars from Left|Chars from Right"
     """
-    return {**params, 'method': 0}
+    return {**params, 'method': 0, 'numchars': 1}
 
 def _migrate_params_v1_to_v2(params):
     """

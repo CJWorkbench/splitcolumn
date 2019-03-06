@@ -233,14 +233,14 @@ class TestSplitColumns(unittest.TestCase):
         # convert ints to equivalent string
         params = {'column':'foo', 'delimiter':','}
         new_params = migrate_params(params)
-        self.assertDictEqual(new_params, {'column':'foo', 'method':'delimiter', 'delimiter':','})
+        self.assertDictEqual(new_params, {'column':'foo', 'method':'delimiter', 'delimiter':',', 'numchars':1})
 
 
     def test_parameter_migration_v1_to_v2(self):
         # convert ints to equivalent string
-        params = {'column':'foo', 'method':1, 'delimiter':','}
+        params = {'column':'foo', 'method':1, 'delimiter':',', 'numchars':3}
         new_params = migrate_params(params)
-        self.assertDictEqual(new_params, {'column':'foo', 'method':'left', 'delimiter':','})
+        self.assertDictEqual(new_params, {'column':'foo', 'method':'left', 'delimiter':',', 'numchars':3})
 
         # don't convert if method is already string
         params = {'column':'foo', 'method':'right', 'delimiter':','}
