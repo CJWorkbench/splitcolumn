@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 
 
+MaxNResultColumns = 100  # prevent out-of-memory
+
 
 def _migrate_params_v0_to_v1(params):
     """
@@ -33,9 +35,9 @@ def migrate_params(params):
 # Returns a table (multiple columns) of string category type, or None meaning NOP
 def dosplit(coldata, params):
     # v1 params or method = Delimiter
-    if 'method' not in params or params['method'] == 'delimiter':
+    if params['method'] == 'delimiter':
         delim = params['delimiter']
-        return coldata.str.split(delim, expand=True)
+        return coldata.str.split(delim, expand=True, n=MaxNResultColumns)
 
     # otherwise, split off left or right chars 
     numchars = params['numchars']
