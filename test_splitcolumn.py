@@ -1,6 +1,7 @@
 import unittest
-import pandas as pd
 import numpy as np
+import pandas as pd
+from pandas.testing import assert_frame_equal
 from splitcolumn import render,migrate_params
 
 
@@ -44,6 +45,20 @@ class TestSplitColumns(unittest.TestCase):
         params = {'column': 'stringcol', 'method':'delimiter', 'delimiter': '', 'numchars':1}
         out = render(self.table, params)
         self.assertTrue(out.equals(self.table)) 
+
+    def test_split_dot(self):
+        table = pd.DataFrame({'A': ['abcd..ef', 'bcde..fg']})
+        result = render(table, {
+            'column': 'A',
+            'method': 'delimiter',
+            'delimiter': '..', 
+            'numchars': 1,
+        })
+        # Pandas default is to treat '..' as a regex.
+        assert_frame_equal(result, pd.DataFrame({
+            'A 1': ['abcd', 'bcde'],
+            'A 2': ['ef', 'fg'],
+        }))
 
     def test_split_str(self):
         column = 'stringcol'

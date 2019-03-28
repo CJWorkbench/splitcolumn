@@ -1,5 +1,6 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
+import re
 
 
 MaxNResultColumns = 100  # prevent out-of-memory
@@ -36,7 +37,9 @@ def migrate_params(params):
 def dosplit(coldata, params):
     # v1 params or method = Delimiter
     if params['method'] == 'delimiter':
-        delim = params['delimiter']
+        # pandas does not split by string (despite what its docs say). It
+        # splits by regex. Turn our string into a regex so we can split it.
+        delim = re.escape(params['delimiter'])
         return coldata.str.split(delim, expand=True, n=MaxNResultColumns)
 
     # otherwise, split off left or right chars 
