@@ -45,7 +45,6 @@ class TestSplitColumns(unittest.TestCase):
         out = render(self.table, params)
         self.assertTrue(out.equals(self.table)) 
 
-
     def test_split_str(self):
         column = 'stringcol'
         params = {'column': column, 'method':'delimiter', 'delimiter': '.', 'numchars':1}
@@ -174,7 +173,6 @@ class TestSplitColumns(unittest.TestCase):
         ref = self.table
         self.assertTrue(out.equals(ref))
 
-
     def test_split_left(self):
         column = 'stringcol'
         params = {'column': column, 'method': 'left', 'delimiter':',', 'numchars':2}
@@ -188,7 +186,6 @@ class TestSplitColumns(unittest.TestCase):
                     ['b']*5])
 
         pd.testing.assert_frame_equal(out, ref)
-
 
     def test_split_right(self):
         column = 'stringcol'
@@ -212,7 +209,6 @@ class TestSplitColumns(unittest.TestCase):
         out = render(self.table, params)
         self.assertTrue(out.equals(self.table))
 
-
     def test_split_right_many_characters(self):
         # if we ask for more characters than there are, we should get all of them plus an empty column
         column = 'stringcol'
@@ -228,26 +224,53 @@ class TestSplitColumns(unittest.TestCase):
 
         pd.testing.assert_frame_equal(out, ref)
 
+    def test_migrate_params_v0_to_v1(self):
+        # force method=delimiter
+        self.assertEqual(
+            migrate_params({
+                'column':'foo',
+                'delimiter':',',
+            }),
+            {
+                'column': 'foo',
+                'method': 'delimiter',
+                'delimiter': ',',
+                'numchars': 1,
+            }
+        )
+    def test_migrate_params_v1_to_v2(self):
+        # convert method=int to method=str
+        self.assertEqual(
+            migrate_params({
+                'column': 'foo',
+                'method': 1,
+                'delimiter': ',',
+                'numchars': 3,
+            }),
+            {
+                'column': 'foo',
+                'method': 'left',
+                'delimiter': ',',
+                'numchars': 3,
+            }
+        )
 
-    def test_parameter_migration_v0_to_v1(self):
-        # convert ints to equivalent string
-        params = {'column':'foo', 'delimiter':','}
-        new_params = migrate_params(params)
-        self.assertDictEqual(new_params, {'column':'foo', 'method':'delimiter', 'delimiter':',', 'numchars':1})
+    def test_migrate_params_v2(self):
+        self.assertEqual(
+            migrate_params({
+                'column': 'foo',
+                'method': 'right',
+                'delimiter': ',',
+                'numchars': 1,
+            }),
+            {
+                'column':'foo',
+                'method':'right',
+                'delimiter':',',
+                'numchars':1,
+            }
+        )
 
-
-    def test_parameter_migration_v1_to_v2(self):
-        # convert ints to equivalent string
-        params = {'column':'foo', 'method':1, 'delimiter':',', 'numchars':3}
-        new_params = migrate_params(params)
-        self.assertDictEqual(new_params, {'column':'foo', 'method':'left', 'delimiter':',', 'numchars':3})
-
-        # don't convert if method is already string
-        params = {'column':'foo', 'method':'right', 'delimiter':',', 'numchars':1}
-        new_params = migrate_params(params)
-        self.assertDictEqual(params, new_params)
 
 if __name__ == '__main__':
     unittest.main()
-
-
