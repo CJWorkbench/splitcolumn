@@ -14,6 +14,7 @@ def _migrate_params_v0_to_v1(params):
     """
     return {**params, 'method': 0, 'numchars': 1}
 
+
 def _migrate_params_v1_to_v2(params):
     """
     v1: 'method' is an index into "Delimiter|Chars from Left|Chars from Right"
@@ -21,6 +22,7 @@ def _migrate_params_v1_to_v2(params):
     v2: 'method' is one of 'delimiter', 'left', 'right'
     """
     return {**params, 'method': ['delimiter','left','right'][params['method']]}
+
 
 def migrate_params(params):
     if 'method' not in params:
@@ -35,7 +37,6 @@ def migrate_params(params):
 # Take a string column, split according to user's chosen method
 # Returns a table (multiple columns) of string category type, or None meaning NOP
 def dosplit(coldata, params):
-    # v1 params or method = Delimiter
     if params['method'] == 'delimiter':
         # pandas does not split by string (despite what its docs say). It
         # splits by regex. Turn our string into a regex so we can split it.
@@ -44,8 +45,8 @@ def dosplit(coldata, params):
 
     # otherwise, split off left or right chars 
     numchars = params['numchars']
-    if numchars<=0:
-        return None    # NOP
+    if numchars <= 0:
+        return 'Please choose a positive number of characters.'
 
     if params['method'] == 'left':
         return pd.concat([coldata.str[:numchars], coldata.str[numchars:]], axis=1)
@@ -54,87 +55,39 @@ def dosplit(coldata, params):
         return pd.concat([coldata.str[:-numchars], coldata.str[-numchars:]], axis=1)
 
 
-# Convert float column to string, remove decimal if float is a whole number
-# and fill nulls with '' to avoid 'NaN'
-# (To be replaced when we have type format utilities)
-def convert_float_to_str(col):
-    ints = col[col % 1 == 0].astype(int)
-    col = col.fillna('').astype(str)
-    col.update(ints.astype(str))
-    return col
-
-
-# Converts all possible column types to simple strings, including categorical
-def col_to_str(col):
-    if col.dtype.name == 'category':
-        if col.cat.categories.dtype == float:
-            # Floats stored as categories
-            return convert_float_to_str(col.astype(float))
-
-        elif col.cat.categories.dtype == object: 
-            # Strings stored as categories
-            copy = col.copy()
-            if '' not in copy.cat.categories:
-                copy.cat.add_categories([''], inplace=True) # Must add '' to category if want to remove NaN
-            return copy.fillna('')
-
-        else:
-            # Some other categorical type. Cast to string.
-            return col.astype(str)
-
-    elif col.dtype == float:
-        # Floats
-        return convert_float_to_str(col)
-
-    else:
-        # Everything else, like ints and strings
-        return col.astype(str)
-
-
 def render(table, params):
     colname = params['column']
 
     if colname == '':
       return table
 
-    using_delimiter = ('method' not in params) or (params['method']=='delimiter')
-    if using_delimiter and params['delimiter']=='':
+    if params['method'] == 'delimiter' and not params['delimiter']:
         return table   # Empty delimiter, NOP
 
-    coldata = col_to_str(table[colname])
-    newcols = dosplit(coldata, params)
+    newcols = dosplit(table[colname], params)
 
     # NOP if input is bad or we didn't find the delimiter anywhere
-    if (newcols is None) or (len(newcols.columns) == 1):
-      return table
+    if isinstance(newcols, str):
+        # Invalid form input
+        return newcols
+    if len(newcols.columns) == 1:
+        # We didn't find the delimiter anywhere
+        return table
 
-    # preserve category-ness (cat string, cat float, etc.)
-    if table[colname].dtype.name == 'category':
-        if using_delimiter:
-            newcols = newcols.astype('category')
-        else:
-            # We cannot convert to categories after taking left/right chars in Pandas 0.23.x
-            # Remove this conditional after upgrading Workbench to 0.24
-            # Minimal reproduction of bug:
-            # import pandas as pd
-            # a = pd.DataFrame(['The string is best','When in silence'])
-            # b = a[0]
-            # c = pd.concat([b.str[:5], b.str[5:]], axis=1)
-            # c.astype('category')
-            # --> Fatal Python error: Cannot recover from stack overflow.
-            pass
+    # preserve category-ness
+    if hasattr(table[colname], 'cat'):
+        newcols = newcols.astype('category')
 
     # Number the split columns
-    newcols.columns = [colname + ' ' + str(x+1) for x in range(len(newcols.columns))]
+    newcols.columns = [colname + ' ' + str(x+1)
+                       for x in range(len(newcols.columns))]
 
-    if len(table.columns)>1:
+    if len(table.columns) > 1:
         # glue before, split, and after columns together
+        # TODO test this
         colloc = table.columns.get_loc(colname)
         start = table.iloc[:, :colloc]
         end = table.iloc[:, colloc+1:]
         return pd.concat([start, newcols, end], axis=1)
     else:
         return newcols
-
-
-

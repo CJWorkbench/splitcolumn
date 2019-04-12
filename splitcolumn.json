@@ -9,7 +9,8 @@
     {
       "name": "Column",
       "id_name" : "column",
-      "type": "column"
+      "type": "column",
+      "column_types": [ "text" ]
     },
     {
       "name": "Split on",
