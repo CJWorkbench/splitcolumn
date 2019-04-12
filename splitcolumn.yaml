@@ -1,0 +1,34 @@
+id_name: splitcolumn
+name: Split column
+description: Split a column by a delimiter or by taking its leftmost or rightmost characters.
+category: Clean
+icon: split
+help_url: modules/clean/split-column
+parameters:
+- id_name: column
+  type: column
+  name: Column
+  column_types: [ text ]
+- id_name: method
+  type: menu
+  name: Split on
+  default: delimiter
+  options:
+  - { value: delimiter, label: Delimiter }
+  - { value: left, label: X characters from left }
+  - { value: right, label: X characters from right }
+- id_name: delimiter
+  type: string
+  name: Delimiter
+  placeholder: Any character(s)
+  default: '-'
+  visible_if:
+    id_name: method
+    value: [ delimiter ]
+- id_name: numchars
+  type: integer
+  name: Number of characters
+  default: 1
+  visible_if:
+    id_name: method
+    value: [ left, right ]
