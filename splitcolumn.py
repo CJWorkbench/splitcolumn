@@ -36,35 +36,34 @@ def migrate_params(params):
 
 # Take a string column, split according to user's chosen method
 # Returns a table (multiple columns) of string category type, or None meaning NOP
-def dosplit(coldata, params):
-    if params['method'] == 'delimiter':
+def dosplit(coldata, *, method: str, delimiter: str, numchars: int):
+    if method == 'delimiter':
         # pandas does not split by string (despite what its docs say). It
         # splits by regex. Turn our string into a regex so we can split it.
-        delim = re.escape(params['delimiter'])
-        return coldata.str.split(delim, expand=True, n=MaxNResultColumns)
+        return coldata.str.split(re.escape(delimiter), expand=True,
+                                 n=MaxNResultColumns)
+    else:
+        # otherwise, split off left or right chars
+        if numchars <= 0:
+            return 'Please choose a positive number of characters.'
 
-    # otherwise, split off left or right chars 
-    numchars = params['numchars']
-    if numchars <= 0:
-        return 'Please choose a positive number of characters.'
-
-    if params['method'] == 'left':
-        return pd.concat([coldata.str[:numchars], coldata.str[numchars:]], axis=1)
-    else:   
-        # 'Characters from right
-        return pd.concat([coldata.str[:-numchars], coldata.str[-numchars:]], axis=1)
+        if method == 'left':
+            return pd.concat([coldata.str[:numchars], coldata.str[numchars:]], axis=1)
+        else:
+            # 'Characters from right
+            return pd.concat([coldata.str[:-numchars], coldata.str[-numchars:]], axis=1)
 
 
 def render(table, params):
-    colname = params['column']
+    colname = params.pop('column')
 
     if colname == '':
-      return table
+        return table
 
     if params['method'] == 'delimiter' and not params['delimiter']:
         return table   # Empty delimiter, NOP
 
-    newcols = dosplit(table[colname], params)
+    newcols = dosplit(table[colname], **params)
 
     # NOP if input is bad or we didn't find the delimiter anywhere
     if isinstance(newcols, str):

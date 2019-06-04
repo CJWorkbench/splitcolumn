@@ -57,6 +57,22 @@ class TestSplitColumns(unittest.TestCase):
             'A 2': ['c', 'c', np.nan, np.nan, np.nan],
         }, dtype='category'))
 
+    def test_split_empty_cat_by_delimiter(self):
+        table = pd.DataFrame({'A': [np.nan]}, dtype=str).astype('category')
+        result = render(table, P(column='A', delimiter='.'))
+        assert_frame_equal(
+            result,
+            pd.DataFrame({'A': [np.nan]}, dtype=str).astype('category')
+        )
+
+    def test_split_empty_cat_by_numchars(self):
+        table = pd.DataFrame({'A': [np.nan]}, dtype=str).astype('category')
+        result = render(table, P(column='A', method='left', numchars=2))
+        assert_frame_equal(result, pd.DataFrame({
+            'A 1': [np.nan],
+            'A 2': [np.nan],
+        }, dtype=str).astype('category'))
+
     def test_multiple_splits(self):
         table = pd.DataFrame({'A': ['2019-01-01', '2019-04', '2019', '']})
         result = render(table, P(column='A', delimiter='-'))
