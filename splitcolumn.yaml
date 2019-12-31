@@ -1,6 +1,6 @@
 id_name: splitcolumn
 name: Split column
-description: Split a column by a delimiter or by taking its leftmost or rightmost characters.
+description: Split a column on a specific delimiter or by counting characters from left of right.
 category: Clean
 icon: split
 help_url: modules/clean/split-column
