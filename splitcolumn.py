@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import re
+from cjwmodule import i18n
 
 
 MaxNResultColumns = 100  # prevent out-of-memory
@@ -45,7 +46,10 @@ def dosplit(coldata, *, method: str, delimiter: str, numchars: int):
     else:
         # otherwise, split off left or right chars
         if numchars <= 0:
-            return 'Please choose a positive number of characters.'
+            return i18n.trans(
+                "badParam.numchars.negative",
+                'Please choose a positive number of characters.'
+            )
 
         if method == 'left':
             return pd.concat([coldata.str[:numchars], coldata.str[numchars:]], axis=1)
@@ -66,7 +70,7 @@ def render(table, params):
     newcols = dosplit(table[colname], **params)
 
     # NOP if input is bad or we didn't find the delimiter anywhere
-    if isinstance(newcols, str):
+    if isinstance(newcols, i18n.I18nMessage):
         # Invalid form input
         return newcols
     if len(newcols.columns) == 1:

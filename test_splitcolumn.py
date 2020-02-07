@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from pandas.testing import assert_frame_equal
 from splitcolumn import render, migrate_params
+from cjwmodule.testing.i18n import i18n_message
 
 
 def P(column: str = '', method: str = 'delimiter', delimiter: str = '-',
@@ -109,7 +110,7 @@ class TestSplitColumns(unittest.TestCase):
                         P(column='A', method='right', numchars=-2))
         self.assertEqual(
             result,
-            'Please choose a positive number of characters.'
+            i18n_message("badParam.numchars.negative")
         )
 
     def test_migrate_params_v0_to_v1(self):
