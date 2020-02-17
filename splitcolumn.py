@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import re
 from cjwmodule import i18n
-from cjwmodule.util.colnames import gen_unique_clean_colnames
+from cjwmodule.util.colnames import gen_unique_clean_colnames_and_warn
 
 
 MaxNResultColumns = 100  # prevent out-of-memory
@@ -84,12 +84,11 @@ def render(table, params):
     # Name the new columns
     conflict_colnames = list(table.columns)
     conflict_colnames.remove(colname)
-    uccolnames = gen_unique_clean_colnames(
+    uccolnames, warnings = gen_unique_clean_colnames_and_warn(
         ["%s %d" % (colname, i + 1) for i in range(len(newcols.columns))],
         existing_names=conflict_colnames,
     )
-    newcols.columns = [ucc.name for ucc in uccolnames]
-    # TODO warn about renames
+    newcols.columns = [ucc for ucc in uccolnames]
 
     if len(table.columns) > 1:
         # glue before, split, and after columns together
@@ -97,6 +96,12 @@ def render(table, params):
         colloc = table.columns.get_loc(colname)
         start = table.iloc[:, :colloc]
         end = table.iloc[:, colloc + 1 :]
-        return pd.concat([start, newcols, end], axis=1)
+        if warnings:
+            return (pd.concat([start, newcols, end], axis=1), warnings)
+        else:
+            return pd.concat([start, newcols, end], axis=1)
     else:
-        return newcols
+        if warnings:
+            return (newcols, warnings)
+        else:
+            return newcols
