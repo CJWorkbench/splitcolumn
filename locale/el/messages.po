@@ -20,7 +20,7 @@ msgstr ""
 "Generated-By: Babel 2.8.0\n"
 
 msgid "_spec.name"
-msgstr ""
+msgstr "Διαχωρισμός στήλης"
 
 msgid "_spec.description"
 msgstr ""
