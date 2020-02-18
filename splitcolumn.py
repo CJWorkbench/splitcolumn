@@ -96,12 +96,11 @@ def render(table, params):
         colloc = table.columns.get_loc(colname)
         start = table.iloc[:, :colloc]
         end = table.iloc[:, colloc + 1 :]
-        if warnings:
-            return (pd.concat([start, newcols, end], axis=1), warnings)
-        else:
-            return pd.concat([start, newcols, end], axis=1)
+        result = pd.concat([start, newcols, end], axis=1)
     else:
-        if warnings:
-            return (newcols, warnings)
-        else:
-            return newcols
+        result = newcols
+
+    if warnings:
+        return (result, warnings)
+    else:
+        return result
