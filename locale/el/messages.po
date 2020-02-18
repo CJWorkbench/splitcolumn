@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-02-07 20:12+0000\n"
+"POT-Creation-Date: 2020-02-18 16:12+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: el\n"
@@ -20,37 +20,39 @@ msgstr ""
 "Generated-By: Babel 2.8.0\n"
 
 msgid "_spec.name"
-msgstr ""
+msgstr "Διαίρεση στήλης"
 
 msgid "_spec.description"
 msgstr ""
+"Διαίρεση στήλης βάσει συγκεκριμένου οριοθέτη ή μετρώντας χαρακτήρες από "
+"αριστερά ή από δεξιά."
 
 msgid "_spec.parameters.column.name"
-msgstr ""
+msgstr "Στήλη"
 
 msgid "_spec.parameters.method.name"
-msgstr ""
+msgstr "Διαίρεση στο"
 
 msgid "_spec.parameters.method.options.delimiter.label"
-msgstr ""
+msgstr "Οριοθέτης"
 
 msgid "_spec.parameters.method.options.left.label"
-msgstr ""
+msgstr "Χ χαρακτήρες από αριστερά"
 
 msgid "_spec.parameters.method.options.right.label"
-msgstr ""
+msgstr "Χ χαρακτήρες από δεξιά"
 
 msgid "_spec.parameters.delimiter.name"
-msgstr ""
+msgstr "Οριοθέτης"
 
 msgid "_spec.parameters.delimiter.placeholder"
-msgstr ""
+msgstr "Οποιοιδήποτε χαρακτήρες"
 
 msgid "_spec.parameters.delimiter.default"
-msgstr ""
+msgstr "-"
 
 msgid "_spec.parameters.numchars.name"
-msgstr ""
+msgstr "Αριθμός χαρακτήρων"
 
 #: splitcolumn.py:49
 msgid "badParam.numchars.negative"
