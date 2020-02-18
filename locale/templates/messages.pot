@@ -1,0 +1,49 @@
+#. default-message: Split column
+msgid "_spec.name"
+msgstr ""
+
+#. default-message: Split a column on a specific delimiter or by counting characters from left of right.
+msgid "_spec.description"
+msgstr ""
+
+#. default-message: Column
+msgid "_spec.parameters.column.name"
+msgstr ""
+
+#. default-message: Split on
+msgid "_spec.parameters.method.name"
+msgstr ""
+
+#. default-message: Delimiter
+msgid "_spec.parameters.method.options.delimiter.label"
+msgstr ""
+
+#. default-message: X characters from left
+msgid "_spec.parameters.method.options.left.label"
+msgstr ""
+
+#. default-message: X characters from right
+msgid "_spec.parameters.method.options.right.label"
+msgstr ""
+
+#. default-message: Delimiter
+msgid "_spec.parameters.delimiter.name"
+msgstr ""
+
+#. default-message: Any character(s)
+msgid "_spec.parameters.delimiter.placeholder"
+msgstr ""
+
+#. default-message: -
+msgid "_spec.parameters.delimiter.default"
+msgstr ""
+
+#. default-message: Number of characters
+msgid "_spec.parameters.numchars.name"
+msgstr ""
+
+#. default-message: Please choose a positive number of characters.
+#: splitcolumn.py:49
+msgid "badParam.numchars.negative"
+msgstr ""
+

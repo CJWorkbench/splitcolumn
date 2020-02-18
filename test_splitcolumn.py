@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from pandas.testing import assert_frame_equal
 from splitcolumn import render, migrate_params
+from cjwmodule.testing.i18n import i18n_message, cjwmodule_i18n_message
 
 
 def P(
@@ -120,14 +121,20 @@ class TestSplitColumns(unittest.TestCase):
         result = render(
             pd.DataFrame({"A": ["a"]}), P(column="A", method="right", numchars=-2)
         )
-        self.assertEqual(result, "Please choose a positive number of characters.")
+        self.assertEqual(result, i18n_message("badParam.numchars.negative"))
 
     def test_split_rename_duplicate_column(self):
         result = render(pd.DataFrame({"A": ["a-b-c"], "A 2": ["x"]}), P(column="A"))
-        assert_frame_equal(
-            result,
-            pd.DataFrame({"A 1": ["a"], "A 4": ["b"], "A 3": ["c"], "A 2": ["x"]}),
-        )
+        assert_frame_equal(result[0], pd.DataFrame({"A 1": ["a"], "A 4": ["b"], "A 3": ["c"], "A 2": ["x"]}))
+        assert result[1] == [
+            cjwmodule_i18n_message(
+                "util.colnames.warnings.numbered", 
+                {
+                    "n_columns": 1,
+                    "first_colname": "A 4",
+                }
+            )
+        ]
 
     def test_migrate_params_v0_to_v1(self):
         # force method=delimiter

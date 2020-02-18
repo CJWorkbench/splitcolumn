@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 import re
-from cjwmodule.util.colnames import gen_unique_clean_colnames
+from cjwmodule import i18n
+from cjwmodule.util.colnames import gen_unique_clean_colnames_and_warn
 
 
 MaxNResultColumns = 100  # prevent out-of-memory
@@ -45,7 +46,10 @@ def split_series(coldata, *, method: str, delimiter: str, numchars: int):
     else:
         # otherwise, split off left or right chars
         if numchars <= 0:
-            return "Please choose a positive number of characters."
+            return i18n.trans(
+                "badParam.numchars.negative",
+                'Please choose a positive number of characters.'
+            )
 
         if method == "left":
             return pd.concat([coldata.str[:numchars], coldata.str[numchars:]], axis=1)
@@ -66,7 +70,7 @@ def render(table, params):
     newcols = split_series(table[colname], **params)
 
     # NOP if input is bad or we didn't find the delimiter anywhere
-    if isinstance(newcols, str):
+    if isinstance(newcols, i18n.I18nMessage):
         # Invalid form input
         return newcols
     if len(newcols.columns) == 1:
@@ -80,12 +84,11 @@ def render(table, params):
     # Name the new columns
     conflict_colnames = list(table.columns)
     conflict_colnames.remove(colname)
-    uccolnames = gen_unique_clean_colnames(
+    uccolnames, warnings = gen_unique_clean_colnames_and_warn(
         ["%s %d" % (colname, i + 1) for i in range(len(newcols.columns))],
         existing_names=conflict_colnames,
     )
-    newcols.columns = [ucc.name for ucc in uccolnames]
-    # TODO warn about renames
+    newcols.columns = [ucc for ucc in uccolnames]
 
     if len(table.columns) > 1:
         # glue before, split, and after columns together
@@ -93,6 +96,11 @@ def render(table, params):
         colloc = table.columns.get_loc(colname)
         start = table.iloc[:, :colloc]
         end = table.iloc[:, colloc + 1 :]
-        return pd.concat([start, newcols, end], axis=1)
+        result = pd.concat([start, newcols, end], axis=1)
     else:
-        return newcols
+        result = newcols
+
+    if warnings:
+        return (result, warnings)
+    else:
+        return result
