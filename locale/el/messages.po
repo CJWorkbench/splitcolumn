@@ -56,5 +56,5 @@ msgstr "Αριθμός χαρακτήρων"
 
 #: splitcolumn.py:49
 msgid "badParam.numchars.negative"
-msgstr ""
+msgstr "Διαλέξτε θετικό αριθμό χαρακτήρων."
 
